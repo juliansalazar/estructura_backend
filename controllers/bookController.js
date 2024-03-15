@@ -23,26 +23,22 @@ const createBook = async (req, res) => {
 
 
 const createBook = async (req, res) => {
-    try {
-        const authorsData = req.body.authors;
+try {
+    let authorsData = req.body.authors;
     const bookData = req.body.book;
     if (!authorsData || !bookData) {
         res.status(400).json({
             msg: 'Book data missing.'
-        })
+    })
     }
     if(!Array.isArray(authorsData)) {
         res.status(400).json({
             msg: 'Authors data must be an array.'
-        })
+    })
     }
-    // Hay como poner muchisisismas validaciones y existen paquetes como "Joi"
-    
     authorsData = authorsData.map(author => {
         return new Author(author);
     })
-
-    // Crear libros
     const newBook = await Book.create({
         genre: bookData.genre,
         title: bookData.title,
@@ -51,12 +47,12 @@ const createBook = async (req, res) => {
         authors: authorsData
     });
     res.json(newBook);
-    } catch (error) {
-        res.status(500).json({
-            msg: 'Error al crear book:',
-            error
-        });
-    }
+} catch (error) {
+    res.status(500).json({
+        msg: 'Error al crear book:',
+        error
+    });
+}
 };
 
 
