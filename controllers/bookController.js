@@ -21,7 +21,7 @@ const createBook = async (req, res) => {
     }
 } */
 
-
+/*
 const createBook = async (req, res) => {
 try {
     let authorsData = req.body.authors;
@@ -54,8 +54,7 @@ try {
     });
 }
 };
-
-
+*/
 const getAllBooks = async (req, res) => {
     try {
         const books = await Book.find();
@@ -63,16 +62,51 @@ const getAllBooks = async (req, res) => {
     } catch (error) {
         res.status(500).json(error);
     }
-}
+};
 
 const getBook = async (req, res) => {
     try {
-        const book = await Book.findById(req.params.id);
+        const book = await Book.findById(req.params.bookId).populate('authors');
         if (!book) return res.status(404).json("Book not found");
         res.status(200).json(book);
     } catch (error) {
         res.status(500).json(error);
     }
+};
+
+const createBook  = async (req, res) => {
+try {
+    // 1. Registra Authors en la bbdd
+    
+    // 2. Registrar book con esos authors
+
+const {authors, book} = req.body;
+
+if(!Array.isArray(authors) || !book) {
+    return res.status(400).send('Body incorrecto.')
+};
+
+const authorPromises  = authors.map((author)=>{
+    return Author.create(author);
+})
+// Ejecutar las promesas simultaneamente
+const allAuthors = await Promise.all(authorPromises)
+
+const authorIds = allAuthors.map((author)=> {
+    return author.id
+})
+
+
+book.authors = authorIds
+book.authors = await Book.create(book)
+
+return  res.status(201).json({message: 'Libro creado correctamente', book});
+} catch {
+    res.status(400).json({
+        msg: 'No se creo el libro'
+    })
 }
+}
+
 
 export { createBook, getAllBooks, getBook };
